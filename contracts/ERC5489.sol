@@ -1,13 +1,20 @@
-// SPDX-License-Identifier: MIT
+//SPDX-License-Identifier: CC0-1.0
+pragma solidity ^0.8.0;
 
 import "./interface/IERC5489.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import "@openzeppelin/contracts/utils/Base64.sol";
 
 contract ERC5489 is IERC5489, ERC721Enumerable, Ownable {
     using EnumerableSet for EnumerableSet.AddressSet;
 
+    // NFT tokenId 和授权地址的映射
     mapping(uint256 => EnumerableSet.AddressSet) tokenId2AuthroizedAddresses;
+    // NFT tokenId和所属地址及超链接的映射
     mapping(uint256 => mapping(address=> string)) tokenId2Address2Value;
+    // NFT 和图片的映射
     mapping(uint256 => string) tokenId2ImageUri;
 
     string private _imageURI;

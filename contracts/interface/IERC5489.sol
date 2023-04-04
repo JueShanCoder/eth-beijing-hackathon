@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: CC0-1.0
+//SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.0;
 
 interface IERC5489 {
@@ -53,9 +53,7 @@ interface IERC5489 {
     ) external;
 
     /**
-     * @dev Throws if `tokenId` is not a valid NFT. URIs are defined in RFC 3986.
-     * The URI MUST point to a JSON file that conforms to the "EIP5489 Metadata JSON schema".
-     * 
+     * @dev
      * returns the latest uri of an slot on a token, which is indicated by `tokenId`, `slotManagerAddr`
      */
     function getSlotUri(uint256 tokenId, address slotManagerAddr)
