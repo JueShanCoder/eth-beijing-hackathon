@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./interface/IERC5489.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-contract EnglishAuction {
+contract HNFTAuction {
     using SafeMath for uint256;
     
     constructor(address _owner) {
@@ -57,13 +57,12 @@ contract EnglishAuction {
             emit RefundPreviousBidIncreased(hNFTId, previousBid.tokenContract, previousBid.bidder, previousBid.amount);
         }
  
-        // 优化?
         token = IERC20(tokenContractAddr);
         require(token.allowance(msg.sender, address(this)) >= fragmentAmout, "Insufficient token balance.");
         token.transferFrom(msg.sender, address(this), fragmentAmout);
 
         nft.authorizeSlotTo(hNFTId, msg.sender);
-        delegatecallSetSlotUri(hNFTContractAddr, hNFTId, slotUri);
+        nft.setSlotUri(hNFTId, slotUri);
         highestBid[hNFTId] = Bid(fragmentAmout, msg.sender, tokenContractAddr, slotUri);
         
         emit HighestBidIncreased(hNFTId, highestBid[hNFTId]);
@@ -84,13 +83,5 @@ contract EnglishAuction {
     function checkLarger(uint256 a, uint256 b) public pure returns(bool) {
         uint256 bPlusDiff = b.add(b.mul(2).div(10));
         return a > bPlusDiff;
-    }
-
-    function delegatecallSetSlotUri(address _addr, uint256 hNFTId, string memory slotUri) private {
-        (bool success, ) = _addr.delegatecall(
-            abi.encodeWithSignature("setSlotUri(uint256,string)", hNFTId, slotUri)
-        );
-
-        require(success, "Delegatecall setSlotUri err.");
     }
 }

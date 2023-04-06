@@ -10,11 +10,8 @@ import "@openzeppelin/contracts/utils/Base64.sol";
 contract ERC5489 is IERC5489, ERC721Enumerable, Ownable {
     using EnumerableSet for EnumerableSet.AddressSet;
     
-    // NFT tokenId 和授权地址的映射
     mapping(uint256 => EnumerableSet.AddressSet) tokenId2AuthroizedAddresses;
-    // NFT tokenId和所属地址及超链接的映射
     mapping(uint256 => mapping(address=> string)) tokenId2Address2Value;
-    // NFT 和图片的映射
     mapping(uint256 => string) tokenId2ImageUri;
 
     string private _imageURI;
@@ -27,12 +24,17 @@ contract ERC5489 is IERC5489, ERC721Enumerable, Ownable {
         _;
     }
 
+    modifier onlyApprovedOrOwner(address spender, uint256 tokenId) {
+        require(getApproved(tokenId) == spender, "should be the apprve owner.");
+        _;
+    }
+    
     modifier onlySlotManager(uint256 tokenId) {
         require(_msgSender() == ownerOf(tokenId) || tokenId2AuthroizedAddresses[tokenId].contains(_msgSender()), "address should be authorized");
         _;
     }
 
-    function setSlotUri(uint256 tokenId, string calldata value) override external onlySlotManager(tokenId) {
+    function setSlotUri(uint256 tokenId, string calldata value) override external onlyApprovedOrOwner(msg.sender, tokenId) {
         tokenId2Address2Value[tokenId][_msgSender()] = value;
 
         emit SlotUriUpdated(tokenId, _msgSender(), value);
@@ -42,7 +44,7 @@ contract ERC5489 is IERC5489, ERC721Enumerable, Ownable {
         return tokenId2Address2Value[tokenId][slotManagerAddr];
     }
 
-    function authorizeSlotTo(uint256 tokenId, address slotManagerAddr) override external onlyTokenOwner(tokenId) {
+    function authorizeSlotTo(uint256 tokenId, address slotManagerAddr) override external onlyApprovedOrOwner(msg.sender, tokenId) {
         require(!tokenId2AuthroizedAddresses[tokenId].contains(slotManagerAddr), "address already authorized");
         
         _authorizeSlotTo(tokenId, slotManagerAddr);
@@ -53,7 +55,7 @@ contract ERC5489 is IERC5489, ERC721Enumerable, Ownable {
         emit SlotAuthorizationCreated(tokenId, slotManagerAddr);
     }
 
-    function revokeAuthorization(uint256 tokenId, address slotManagerAddr) override external onlyTokenOwner(tokenId) {
+    function revokeAuthorization(uint256 tokenId, address slotManagerAddr) override external onlyApprovedOrOwner(msg.sender, tokenId) {
         tokenId2AuthroizedAddresses[tokenId].remove(slotManagerAddr);
         delete tokenId2Address2Value[tokenId][slotManagerAddr];
 
