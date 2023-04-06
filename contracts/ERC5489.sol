@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/utils/Base64.sol";
 
 contract ERC5489 is IERC5489, ERC721Enumerable, Ownable {
     using EnumerableSet for EnumerableSet.AddressSet;
-
+    
     // NFT tokenId 和授权地址的映射
     mapping(uint256 => EnumerableSet.AddressSet) tokenId2AuthroizedAddresses;
     // NFT tokenId和所属地址及超链接的映射
