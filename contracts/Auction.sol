@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.4;
+pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./interface/IERC5489.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-contract HNFTAuction {
+contract Auction {
     using SafeMath for uint256;
     
-    constructor(address _owner) {
-        owner = _owner;
+    constructor() {
+        owner = msg.sender;
     }
 
     struct Bid {
@@ -37,10 +37,10 @@ contract HNFTAuction {
 
         uint256 bidAmount = highestBid[hNFTId].amount;
         if (bidAmount == 0) {
-            bidSuccess(hNFTId, fragmentAmout, slotUri, false, tokenContractAddr, hNFTContractAddr);
+            bidSuccess(hNFTId, fragmentAmout, slotUri, false, hNFTContractAddr, tokenContractAddr);
         } else {
             require(checkLarger(fragmentAmout ,bidAmount), "The current bidding price is too low.");
-            bidSuccess(hNFTId, fragmentAmout, slotUri, true, tokenContractAddr, hNFTContractAddr);
+            bidSuccess(hNFTId, fragmentAmout, slotUri, true, hNFTContractAddr, tokenContractAddr);
         }
     }
 
@@ -53,15 +53,16 @@ contract HNFTAuction {
             Bid memory previousBid = highestBid[hNFTId];
             token = IERC20(previousBid.tokenContract);
             token.transfer(previousBid.bidder, previousBid.amount);
-            nft.revokeAuthorization(hNFTId, previousBid.bidder);
+            // nft.revokeAuthorization(hNFTId, previousBid.bidder);
             emit RefundPreviousBidIncreased(hNFTId, previousBid.tokenContract, previousBid.bidder, previousBid.amount);
         }
  
         token = IERC20(tokenContractAddr);
-        require(token.allowance(msg.sender, address(this)) >= fragmentAmout, "Insufficient token balance.");
+        uint256 tokenAllowance = token.allowance(msg.sender, address(this));
+        require(tokenAllowance >= fragmentAmout, "Insufficient token balance.");
         token.transferFrom(msg.sender, address(this), fragmentAmout);
 
-        nft.authorizeSlotTo(hNFTId, msg.sender);
+        // nft.authorizeSlotTo(hNFTId, msg.sender);
         nft.setSlotUri(hNFTId, slotUri);
         highestBid[hNFTId] = Bid(fragmentAmout, msg.sender, tokenContractAddr, slotUri);
         
@@ -82,6 +83,6 @@ contract HNFTAuction {
 
     function checkLarger(uint256 a, uint256 b) public pure returns(bool) {
         uint256 bPlusDiff = b.add(b.mul(2).div(10));
-        return a > bPlusDiff;
+        return a >= bPlusDiff;
     }
 }
