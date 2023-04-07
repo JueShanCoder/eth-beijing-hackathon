@@ -1,26 +1,22 @@
-// We require the Hardhat Runtime Environment explicitly here. This is optional
-// but useful for running the script in a standalone fashion through `node <script>`.
-//
-// You can also run a script with `npx hardhat run <script>`. If you do that, Hardhat
-// will compile your contracts, add the Hardhat Runtime Environment's members to the
-// global scope, and execute the script.
-const hre = require("hardhat");
-
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
-  const unlockTime = currentTimestampInSeconds + ONE_YEAR_IN_SECS;
+  console.log("Deploy Auction contract...");
+  const Auction = await ethers.getContractFactory("Auction");
+  const auction = await Auction.deploy();
+  await auction.deployed();
 
-  const lockedAmount = hre.ethers.utils.parseEther("1");
+  console.log("Deploy ERC5489 contract...");
+  const HNFT = await ethers.getContractFactory("ERC5489");
+  const hnft = await HNFT.deploy();
+  await hnft.deployed();
 
-  const Lock = await hre.ethers.getContractFactory("Lock");
-  const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
+  console.log("Deploy AD3Token contract...");
+  const AD3 = await ethers.getContractFactory("AD3Token");
+  const ad3 = await AD3.deploy(1000);
+  await ad3.deployed();
 
-  await lock.deployed();
-
-  console.log(
-    `Lock with 1 ETH and unlock timestamp ${unlockTime} deployed to ${lock.address}`
-  );
+  console.log("auction address is: ", auction.address);
+  console.log("erc5489 address is: ", hnft.address);
+  console.log("ad3Token address is: ", ad3.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

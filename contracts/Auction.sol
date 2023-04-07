@@ -70,6 +70,7 @@ contract Auction {
     }
 
     function payout(uint256 hNFTId, uint256 fragmentAmount) public {
+        // TODO 添加广告主验签操作
         Bid memory payOutBid = highestBid[hNFTId];
         require(fragmentAmount <= payOutBid.amount, "The advertising sponsor is credit balance is insufficient.");
 
