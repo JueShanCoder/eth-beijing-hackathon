@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./interface/IERC5489.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-contract Auction {
+contract AuctionAndMicroPayment {
     using SafeMath for uint256;
     
     constructor() {

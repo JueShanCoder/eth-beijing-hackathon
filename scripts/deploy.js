@@ -1,6 +1,6 @@
 async function main() {
   console.log("Deploy Auction contract...");
-  const Auction = await ethers.getContractFactory("Auction");
+  const Auction = await ethers.getContractFactory("AuctionAndMicroPayment");
   const auction = await Auction.deploy();
   await auction.deployed();
 

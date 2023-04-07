@@ -11,7 +11,7 @@ describe("Auction", function () {
     beforeEach(async () => {
         [owner, user] = await ethers.getSigners();
 
-        const Auction = await ethers.getContractFactory("Auction");
+        const Auction = await ethers.getContractFactory("AuctionAndMicroPayment");
         auction = await Auction.deploy();
         await auction.deployed();
 
